@@ -68,6 +68,13 @@ def update_task(task_id: int) -> bool:
     db.commit()
     db.close()
 
-#
-def delete_task():
-    pass
+# Функция для удаления задачи
+def delete_task(task_id: int):
+    db, cursor = connect_db()
+    cursor.execute(
+        '''
+        DELETE FROM tasks WHERE id = ?
+        ''', (task_id,)
+    )
+    db.commit()
+    db.close()
