@@ -30,7 +30,7 @@ def create_task(title: str, status=False):
     db.close()
 
 # Функция для вывода списка всех задач
-def get_tasks():
+def get_tasks() -> list[tuple]:
     db, cursor = connect_db()
     cursor.execute(
         '''
@@ -47,10 +47,26 @@ def get_tasks():
             status_str = '✅Выполнено' if status else '❌Не выполнено'
             print(f'{task_id}. {title} {status_str}')
 
-#
-def update_task():
+# Функция для изменения статуса задачи
+def update_task(task_id: int) -> bool:
     db, cursor = connect_db()
-    pass
+    # Получаем текущий статус задачи
+    cursor.execute(
+        '''
+        SELECT status FROM tasks WHERE id = ?
+        ''', (task_id,)
+    )
+    result = cursor.fetchone()
+    current_status = result[0]
+    # Обновляем статус задачи
+    new_status = 0 if current_status else 1
+    cursor.execute(
+        '''
+        UPDATE tasks SET status = ? WHERE id = ?
+        ''', (new_status, task_id)
+    )
+    db.commit()
+    db.close()
 
 #
 def delete_task():
