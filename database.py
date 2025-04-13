@@ -17,8 +17,7 @@ def connect_db():
     db.commit()
     return db, cursor
 
-# CRUD (Create Read Update Delete)
-
+# CRUD (Create Read Update Delete) функционал
 # Функция для создания новой задачи
 def create_task(title: str, status=False):
     db, cursor = connect_db()
@@ -30,12 +29,27 @@ def create_task(title: str, status=False):
     db.commit()
     db.close()
 
-#
+# Функция для вывода списка всех задач
 def get_tasks():
-    pass
+    db, cursor = connect_db()
+    cursor.execute(
+        '''
+        SELECT * FROM tasks
+        '''
+    )
+    tasks = cursor.fetchall()
+    db.close()
+    if not tasks:
+        print('Задач нет.')
+    else:
+        for task in tasks:
+            task_id, title, status = task
+            status_str = '✅Выполнено' if status else '❌Не выполнено'
+            print(f'{task_id}. {title} {status_str}')
 
 #
 def update_task():
+    db, cursor = connect_db()
     pass
 
 #
