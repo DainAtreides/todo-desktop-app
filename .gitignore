@@ -10,3 +10,6 @@ __pycache__/
 # Игнорировать файлы IDE
 .vscode/
 .idea/
+
+build
+dist

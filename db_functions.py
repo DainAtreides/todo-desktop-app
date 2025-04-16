@@ -1,6 +1,7 @@
 import sqlite3
 from db_utils import execute_query
 
+# CRUD функционал
 # Функция для создания задачи
 def create_task(cursor, title: str, status=False):
     if execute_query(cursor, 'SELECT * FROM tasks WHERE title = ?', (title,), fetchone=True):
