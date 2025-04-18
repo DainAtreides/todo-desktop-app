@@ -1,35 +1,40 @@
-from contextlib import closing
-from db_utils import connect_db
-from db_functions import create_task, get_tasks, update_task, delete_task
+from database import Database
+from models import Task 
 
-# Главная функция
+db = Database('todo')
+db.connect()
+
 def main():
-    with closing(connect_db()) as (db, cursor):
-        while True:
-            print("\nМеню:")
-            print("1. Создать задачу")
-            print("2. Показать все задачи")
-            print("3. Обновить статус задачи")
-            print("4. Удалить задачу")
-            print("5. Выйти")
-            
-            choice = input("Выберите действие: ")
-            
-            if choice == '1':
-                title = input("Введите название задачи: ")
-                create_task(cursor, title)
-            elif choice == '2':
-                get_tasks(cursor)
-            elif choice == '3':
-                task_id = input("Введите ID задачи для обновления: ")
-                update_task(cursor, int(task_id) if task_id.isdigit() else None)
-            elif choice == '4':
-                task_id = input("Введите ID задачи для удаления: ")
-                delete_task(cursor, int(task_id) if task_id.isdigit() else None)
-            elif choice == '5':
+    '''Главная функция'''
+    while True:
+        print('\nMain menu:', 
+              '1. Create task', 
+              '2. Show all tasks', 
+              "3. Change task status", 
+              '4. Delete task',
+              '5. Exit', sep='\n')
+        
+        choice = input('Select action: ')
+        match choice:
+            case '1':
+                '''Создаёт задачу'''
+                pass
+            case '2':
+                '''Показывает все задачи'''
+                pass
+            case '3':
+                '''Изменяет статус задачи'''
+                pass
+            case '4':
+                '''Удаляет задачу'''
+                pass
+            case '5':
+                '''Завершает программу'''
+                db.close()
                 break
-            else:
-                print("Неверный выбор.")
+            case _:
+                print('Wrong action choice.')
+                continue
 
 if __name__ == '__main__':
     main()
