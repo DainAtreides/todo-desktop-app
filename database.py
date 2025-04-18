@@ -1,13 +1,25 @@
 import sqlite3
+from abc import ABC, abstractmethod
 
-class Database:
+class Database(ABC):
+    """Абстракция для базы данных"""
+    @abstractmethod
+    def connect(self):
+        pass
+    @abstractmethod
+    def execute_query(self):
+        pass
+    @abstractmethod    
+    def close(self):
+        pass    
+
+class TaskDatabase(Database):
     def __init__(self, db_name: str):
         self.db_name = db_name
         self.connection = None
-        self.cursor = None
-    
+        self.cursor = None   
     def connect(self):
-        '''Подключает существующую или создаёт новую базу данных'''
+        """Подключает существующую или создаёт новую базу данных"""
         if self.db_name:
             self.connection = sqlite3.connect(self.db_name)
             self.cursor = self.connection.cursor()
@@ -17,16 +29,10 @@ class Database:
                                    status BOOLEAN DEFAULT 0)''')
             self.connection.commit()
         else:
-            raise ValueError("Name doesn't exist.")
-            
-    def close(self):
-        '''Закрывает соединение с базой данных'''
-        if self.connection:
-            self.connection.close()
-        
+            raise ValueError("Name doesn't exist.")    
     def execute_query(
         self, query: str, params: tuple = (), fetchone=False, fetchall=False, commit=False):
-        '''Выполняет SQL-запросы'''
+        """Выполняет SQL-запросы"""
         connection = self.connection
         cursor = self.cursor
         try:
@@ -40,3 +46,6 @@ class Database:
         except sqlite3.Error as e:
             print(f'Query execution error: {e}')
             return None
+    def close(self):
+        if self.connection:
+            self.connection.close()

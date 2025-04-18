@@ -1,11 +1,11 @@
-from database import Database
-from models import Task 
+from database import TaskDatabase
+from models import TaskManager 
 
-db = Database('todo')
-db.connect()
+db = TaskDatabase('todo')
+task = TaskManager
 
 def main():
-    '''Главная функция'''
+    """Главная функция"""
     while True:
         print('\nMain menu:', 
               '1. Create task', 
@@ -17,19 +17,22 @@ def main():
         choice = input('Select action: ')
         match choice:
             case '1':
-                '''Создаёт задачу'''
-                pass
+                """Создаёт задачу"""
+                title = input('Enter task title: ')
+                task = Task(title)
+                task.create_task(db)
             case '2':
-                '''Показывает все задачи'''
-                pass
+                """Показывает все задачи"""
+                tasks = db.read_tasks()
+                print(tasks)
             case '3':
-                '''Изменяет статус задачи'''
+                """Изменяет статус задачи"""
                 pass
             case '4':
-                '''Удаляет задачу'''
+                """Удаляет задачу"""
                 pass
             case '5':
-                '''Завершает программу'''
+                """Завершает программу"""
                 db.close()
                 break
             case _:
