@@ -1,8 +1,9 @@
 from database import TaskDatabase
-from models import TaskManager 
+from models import TaskManager
 
 db = TaskDatabase('todo')
-task = TaskManager
+task = TaskManager(db)
+db.connect()  # Убедись, что соединение установлено
 
 def main():
     """Главная функция"""
@@ -18,22 +19,47 @@ def main():
         match choice:
             case '1':
                 """Создаёт задачу"""
-                title = input('Enter task title: ')
-                task = Task(title)
-                task.create_task(db)
+                title = input('Enter task title: ').strip()
+                if not title:
+                    print("Title cannot be empty. Please try again.")
+                    continue
+                task.create(title)
+                print(f"Task '{title}' created.")
             case '2':
                 """Показывает все задачи"""
-                tasks = db.read_tasks()
-                print(tasks)
+                tasks = task.show()
+                if tasks:
+                    print('All tasks:')
+                    for t in tasks:
+                        print(f"{t[0]}. {t[1]} - Status: {('Completed' if t[-1] else 'Pending')}")
+                else:
+                    print('No tasks found.')
             case '3':
                 """Изменяет статус задачи"""
-                pass
+                try:
+                    task_id = int(input('Enter task ID to change status: '))
+                    if task_id <= 0:
+                        print("Invalid task ID. It must be a positive integer.")
+                        continue
+                    task.update(task_id)
+                    print(f"Task {task_id} status updated.")
+                except ValueError:
+                    print("Invalid input. Please enter a valid task ID.")
             case '4':
                 """Удаляет задачу"""
-                pass
+                try:
+                    task_id = int(input('Enter task ID to delete: '))
+                    if task_id <= 0:
+                        print("Invalid task ID. It must be a positive integer.")
+                        continue
+                    task.delete(task_id)
+                    print(f"Task {task_id} deleted.")
+                except ValueError:
+                    print("Invalid input. Please enter a valid task ID.")
             case '5':
                 """Завершает программу"""
                 db.close()
+                print("Program ended.")
                 break
             case _:
                 print('Wrong action choice.')
