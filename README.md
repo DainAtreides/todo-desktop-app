@@ -1,5 +1,6 @@
 # To-Do App
 
+![Screenshot](assets/screenshot.png)
 A simple To-Do app built using Python with Kivy for the GUI, SQLite for task storage, and an interactive console interface.
 
 ## Features
