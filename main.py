@@ -4,7 +4,10 @@ from core.models import TaskManager
 db = TaskDatabase('todo')
 task = TaskManager(db)
 db.connect()
+<<<<<<< HEAD
 
+=======
+>>>>>>> f30da920894dae1b401b0e965012c48ddc3f3487
 
 def main():
     """Главная функция"""
