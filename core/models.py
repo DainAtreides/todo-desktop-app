@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from database import Database
+from database.db import Database
+
 
 class Task(ABC):
     """Абстракция для задачи"""
@@ -19,10 +20,11 @@ class Task(ABC):
     def show(self):
         pass
 
+
 class TaskManager(Task):
     def __init__(self, db: Database):
         self.db = db
-        
+
     def create(self, title: str):
         """Создаёт задачу в базе данных"""
         if not title:
@@ -31,7 +33,7 @@ class TaskManager(Task):
         query = 'INSERT INTO tasks (title) VALUES (?)'
         params = (title,)
         self.db.execute_query(query, params, commit=True)
-        
+
     def update(self, task_id: int):
         """Обновляет статус задачи"""
         query = 'SELECT status FROM tasks WHERE id = ?'
@@ -53,7 +55,7 @@ class TaskManager(Task):
             return
         query = 'DELETE FROM tasks WHERE id = ?'
         self.db.execute_query(query, (task_id,), commit=True)
-        
+
     def show(self):
         """Показывает все задачи"""
         query = 'SELECT * FROM tasks'
