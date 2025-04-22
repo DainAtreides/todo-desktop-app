@@ -1,33 +1,45 @@
 import sqlite3
+import logging
 from abc import ABC, abstractmethod
 
+# Set up basic logging configuration
+logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
+logger = logging.getLogger(__name__)
+
+
+# Abstract base class for a database
 class Database(ABC):
-    """Абстракция для базы данных"""
     @abstractmethod
     def connect(self):
+        # Establish a database connection
         pass
 
     @abstractmethod
     def execute_query(self):
+        # Execute an SQL query
         pass
 
-    @abstractmethod    
+    @abstractmethod
     def close(self):
-        pass    
+        # Close the database connection
+        pass
 
+
+# Concrete implementation of the Database for task management
 class TaskDatabase(Database):
     def __init__(self, db_name: str):
+        # Initialize with database name
         self.db_name = db_name
         self.connection = None
-        self.cursor = None   
+        self.cursor = None
 
     def connect(self):
-        """Подключает существующую или создаёт новую базу данных"""
+        # Connect to SQLite database and create tasks table if needed
         if self.db_name:
             if self.connection:
-                print("Connection already established.")
-                return  # Уже есть соединение
-            print("Connecting to the database...")
+                logger.warning('Connection already established.')
+                return
+            logger.info('Connecting to the database...')
             self.connection = sqlite3.connect(self.db_name)
             self.cursor = self.connection.cursor()
             self.cursor.execute('''CREATE TABLE IF NOT EXISTS tasks (
@@ -35,39 +47,35 @@ class TaskDatabase(Database):
                                    title TEXT NOT NULL,
                                    status BOOLEAN DEFAULT 0)''')
             self.connection.commit()
-            print("Connection established.")
+            logger.info('Connection established.')
         else:
-            raise ValueError("Name doesn't exist.")   
+            raise ValueError('Database name is missing.')
 
-    def execute_query(
-    self, query: str, params: tuple = (), fetchone=False, fetchall=False, commit=False):
-        """Выполняет SQL-запросы"""
+    def execute_query(self, query: str, params: tuple = (), fetchone=False, fetchall=False, commit=False):
+        # Run an SQL query with optional fetching and committing
         if self.connection is None:
-            print("Error: No connection established.")
+            logger.error('No connection established.')
             return None
-        
-        connection = self.connection
-        cursor = self.cursor
         try:
-            print(f"Executing query: {query} with params {params}")
-            cursor.execute(query, params)
+            logger.debug(f'Executing query: {query} | Params: {params}')
+            self.cursor.execute(query, params)
             if commit:
-                connection.commit()
+                self.connection.commit()
             if fetchone:
-                return cursor.fetchone()
+                return self.cursor.fetchone()
             if fetchall:
-                return cursor.fetchall()
+                return self.cursor.fetchall()
         except sqlite3.Error as e:
-            print(f'Query execution error: {e}')
+            logger.error(f'Query execution error: {e}')
             return None
 
     def close(self):
-        """Закрывает соединение с базой данных"""
+        # Close the connection to the database
         if self.connection:
-            print("Closing connection...")
+            logger.info('Closing database connection...')
             self.connection.close()
             self.connection = None
             self.cursor = None
-            print("Connection closed.")
+            logger.info('Connection closed.')
         else:
-            print("No connection to close.")
+            logger.warning('No connection to close.')
