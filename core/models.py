@@ -34,17 +34,16 @@ class TaskManager(Task):
         params = (title,)
         self.db.execute_query(query, params, commit=True)
 
-    def update(self, task_id: int):
-        """Обновляет статус задачи"""
+    def update(self, task_id: int, new_status: bool):
+        """Обновляет статус задачи на основе состояния чекбокса"""
         query = 'SELECT status FROM tasks WHERE id = ?'
         task = self.db.execute_query(query, (task_id,), fetchone=True)
         if not task:
             print(f"Task {task_id} doesn't exist.")
             return
-        current_status = task[-1]
-        new_status = int(not current_status)
+        new_status_int = int(new_status)
         query = 'UPDATE tasks SET status = ? WHERE id = ?'
-        self.db.execute_query(query, (new_status, task_id), commit=True)
+        self.db.execute_query(query, (new_status_int, task_id), commit=True)
 
     def delete(self, task_id: str):
         """Удаляет задачу"""

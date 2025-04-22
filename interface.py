@@ -1,5 +1,6 @@
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
 from gui.factories.widget_factory import WidgetFactory as factory
 from database.db import TaskDatabase
 from core.models import TaskManager
@@ -11,33 +12,48 @@ class ToDoAppGUI(BoxLayout):
         self.db = TaskDatabase('todo')
         self.db.connect()
         self.task_manager = TaskManager(self.db)
-
-        # Box layout to hold task items
+        self.padding = [30, 30, 30, 30]
+        # Главное окно
         self.task_box = factory(
-            'boxlayout',
-            orientation='vertical',
-            size_hint=(1, 1)
+            'gridlayout',
+            cols=1,
+            size_hint=(1, 1),
+            spacing=10
         ).widget
         self.add_widget(self.task_box)
+        """Контейнер для ввода"""
+        input_layout = factory(
+            'boxlayout',
+            orientation='horizontal',
+            size_hint=(1, None),
+            height=40
+        ).widget
+        self.add_widget(input_layout)
 
-        # Text input field with defined height and width
+        """Поле ввода"""
         self.input = factory(
             'textinput',
-            hint_text='Enter new task title',
-            size_hint=(1, None),
-            height=40
+            hint_text='Enter new task...',
+            size_hint=(0.85, None),
+            height=40,
+            font_name='Roboto',
+            font_size='20',
+            multiline=False
         ).widget
-        self.add_widget(self.input)
+        self.input.bind(on_text_validate=self.add_task)
+        input_layout.add_widget(self.input)
 
-        # Add Task button with defined height
+        """Кнопка Добавить"""
         add_button = factory(
             'button',
-            text='Add Task',
-            size_hint=(1, None),
-            height=40
+            text='Add',
+            size_hint=(0.15, None),
+            height=40,
+            font_name='Roboto',
+            font_size='20'
         ).widget
         add_button.bind(on_press=self.add_task)
-        self.add_widget(add_button)
+        input_layout.add_widget(add_button)
 
         self.refresh_tasks()
 
@@ -58,10 +74,9 @@ class ToDoAppGUI(BoxLayout):
             task_layout = factory(
                 'boxlayout',
                 orientation='horizontal',
-                size_hint_y=None,
+                size_hint=(1, None),
                 height=40,
-                padding=5,
-                spacing=5
+                pos_hint={'x': 0}
             ).widget
 
             # Label for task with defined size and text wrapping
@@ -70,36 +85,43 @@ class ToDoAppGUI(BoxLayout):
                 text=f'{title} [{"Done" if status else "Pending"}]',
                 size_hint=(1, None),
                 height=40,
+                font_name='Roboto',
+                font_size='20',
                 valign='middle'
             ).widget
             label.bind(size=lambda inst, val: setattr(label, 'text_size', val))
             task_layout.add_widget(label)
 
-            # Toggle button with defined size
-            toggle_btn = factory(
-                'button',
-                text='Toggle',
+            # Чекбокс для переключения статуса
+            checkbox = factory(
+                'checkbox',
+                # Состояние чекбокса зависит от статуса задачи
+                active=bool(status),
                 size_hint=(None, None),
-                size=(80, 40)
+                size=(80, 40),
             ).widget
-            toggle_btn.bind(on_press=lambda _,
-                            tid=task_id: self.toggle_status(tid))
-            task_layout.add_widget(toggle_btn)
+
+            # Привязываем изменение состояния чекбокса к методу toggle_status
+            checkbox.bind(active=lambda instance, value,
+                          tid=task_id: self.toggle_status(tid, value))
+            task_layout.add_widget(checkbox)
 
             # Delete button with defined size
-            del_btn = factory(
+            del_button = factory(
                 'button',
                 text='Delete',
                 size_hint=(None, None),
-                size=(80, 40)
+                size=(80, 40),
+                font_name='Roboto'
             ).widget
-            del_btn.bind(on_press=lambda _, tid=task_id: self.delete_task(tid))
-            task_layout.add_widget(del_btn)
+            del_button.bind(on_press=lambda _,
+                            tid=task_id: self.delete_task(tid))
+            task_layout.add_widget(del_button)
 
             self.task_box.add_widget(task_layout)
 
-    def toggle_status(self, task_id):
-        self.task_manager.update(task_id)
+    def toggle_status(self, task_id, new_status):
+        self.task_manager.update(task_id, new_status)
         self.refresh_tasks()
 
     def delete_task(self, task_id):
@@ -109,6 +131,9 @@ class ToDoAppGUI(BoxLayout):
 
 class ToDoApp(App):
     def build(self):
+        Window.size = (600, 400)
+        Window.minimum_width = 600
+        Window.minimum_height = 400
         return ToDoAppGUI()
 
 
