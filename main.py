@@ -3,7 +3,7 @@ from models import TaskManager
 
 db = TaskDatabase('todo')
 task = TaskManager(db)
-db.connect()  # Убедись, что соединение установлено
+db.connect()
 
 def main():
     """Главная функция"""
