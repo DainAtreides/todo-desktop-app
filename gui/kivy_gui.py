@@ -103,10 +103,10 @@ class ToDoAppGUI(BoxLayout):
                 pos_hint={'x': 0}
             ).widget
 
-            # Create label for the task with its status (Done or Pending)
+            # Create label for the task
             label = factory(
                 'label',
-                text=f'{title}',
+                text=title,
                 size_hint=(1, None),
                 height=40,
                 font_name='Arial',
@@ -124,7 +124,7 @@ class ToDoAppGUI(BoxLayout):
             # Create checkbox to toggle task status
             checkbox = factory(
                 'checkbox',
-                active=bool(status),
+                active=status,
                 size_hint=(None, None),
                 size=(80, 40),
                 color=(1, 0.5, 0, 1)
