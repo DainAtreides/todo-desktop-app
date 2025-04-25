@@ -21,7 +21,7 @@ def main():
     except Exception as e:
         # If connection fails, log an error and exit the program
         logger.error(f'Error connecting to the database: {e}')
-        exit()
+        sys.exit()
 
     task = TaskManager(db)
 
