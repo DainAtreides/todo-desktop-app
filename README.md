@@ -85,3 +85,6 @@ This will automatically discover and run all test files.
 
 This project is open-source and available under the MIT License. See the [LICENSE](LICENSE) file for details.
 
+## Author
+
+[Dain Atreides](https://github.com/DainAtreides)
